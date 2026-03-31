@@ -20,14 +20,21 @@ public class SlackNotificationService {
     private final String channelId;
 
     public SlackNotificationService() {
-        // .envファイルから認証情報を読み込む
-        Dotenv dotenv = Dotenv.
-            configure()
-            .directory("./ana-sale-notifier")
-            .ignoreIfMissing()
-            .load();
-        this.botToken = dotenv.get("SLACK_BOT_TOKEN");
-        this.channelId = dotenv.get("SLACK_CHANNEL_ID");
+        // 1. まず OS の環境変数をチェック（GitHub Actions はこちらを使う）
+        String envToken = System.getenv("SLACK_BOT_TOKEN");
+        String envChannel = System.getenv("SLACK_CHANNEL_ID");
+
+        if (envToken != null && envChannel != null) {
+            this.botToken = envToken;
+            this.channelId = envChannel;
+        } else {
+            // 2. なければ .env ファイルを探す（ローカル開発用）
+            Dotenv dotenv = Dotenv.configure()
+                .ignoreIfMissing()
+                .load();
+            this.botToken = dotenv.get("SLACK_BOT_TOKEN");
+            this.channelId = dotenv.get("SLACK_CHANNEL_ID");
+        }
     }
 
     /**

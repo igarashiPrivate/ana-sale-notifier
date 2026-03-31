@@ -23,8 +23,8 @@ public class AnaCheckService {
     }
 
     // 30秒ごとに動かすテスト用
-    @Scheduled(fixedRate = 30000)
-    // @Scheduled(cron = "0 0 9 * * *", zone = "Asia/Tokyo")
+    // @Scheduled(fixedRate = 30000)
+    @Scheduled(cron = "0 30 10 * * *", zone = "Asia/Tokyo")
     public void checkSale() {
         try {
             Document doc = Jsoup.connect(anaUrl).get();
@@ -37,12 +37,12 @@ public class AnaCheckService {
 
             // 「タイムセール」の文字列があるか判定する
             if (isSaleEnded) {
-                log.info("タイムセールは終了しています。待ちましょう。");
-                slackNotificationService.send("ANAのタイムセールは終了しています。待ちましょう。");
+                log.info("タイムセール未開催");
+                slackNotificationService.send("ANAのタイムセールは終了しています。待ちましょう。\n" + anaUrl);
             } else {
-                log.info("タイムセールが開催しています！確認してください！！");
+                log.info("タイムセール開催中");
                 // Slackに通知する
-                slackNotificationService.send("ANAのタイムセールが開催しています!確認してください!!");
+                slackNotificationService.send("ANAのタイムセールが開催しています!確認してください!!\n" + anaUrl);
             }
         } catch (IOException e) {
             log.error("接続に失敗しました：{}", e.getMessage());

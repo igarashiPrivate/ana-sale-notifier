@@ -20,15 +20,14 @@ public class SlackNotificationService {
     private final String channelId;
 
     public SlackNotificationService() {
-        // 1. まず OS の環境変数をチェック（GitHub Actions はこちらを使う）
+        // 環境変数を確認
         String envToken = System.getenv("SLACK_BOT_TOKEN");
         String envChannel = System.getenv("SLACK_CHANNEL_ID");
-
+        // 環境変数があれば使う。なければ.envから読み込む
         if (envToken != null && envChannel != null) {
             this.botToken = envToken;
             this.channelId = envChannel;
         } else {
-            // 2. なければ .env ファイルを探す（ローカル開発用）
             Dotenv dotenv = Dotenv.configure()
                 .ignoreIfMissing()
                 .load();
@@ -42,7 +41,6 @@ public class SlackNotificationService {
      * @param message 送信するメッセージ
      */
     public void send(String message) {
-        // try-with-resources でSlackクライアントを確実にクローズする
         try (Slack slack = new Slack()) {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                 .channel(channelId)
@@ -59,7 +57,6 @@ public class SlackNotificationService {
         } catch (SlackApiException | IOException e) {
             log.error("Slackへの通知に失敗しました", e);
         } catch (Exception e) {
-            // Slack.close() がスローする Exception を捕捉する
             log.error("Slackクライアントのクローズに失敗しました", e);
         }
     }

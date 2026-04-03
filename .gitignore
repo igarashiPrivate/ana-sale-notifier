@@ -39,3 +39,7 @@ out/
 # --- Project Specific ---
 /src/main/resources/application.properties
 /src/main/resources/application-*.properties
+
+# macOS
+.DS_Store
+**/.DS_Store

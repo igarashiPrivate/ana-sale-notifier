@@ -1,4 +1,4 @@
-package jar.com.example.demo;
+package com.example;
 import java.io.IOException;
 
 import org.jsoup.Jsoup;

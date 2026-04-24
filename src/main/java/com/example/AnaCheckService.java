@@ -3,17 +3,17 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @Service
 @Slf4j
 public class AnaCheckService {
-    @Value("${ana.timesale.url:https://www.ana.co.jp/ja/jp/domestic/theme/timesale/sv/?dom=1}")
+    @Value("${ana.timesale.url:https://www.ana.co.jp/ja/jp/}")
     private String anaUrl; 
 
     private final SlackNotificationService slackNotificationService;
@@ -22,27 +22,22 @@ public class AnaCheckService {
         this.slackNotificationService = slackNotificationService;
     }
 
-    // 30秒ごとに動かすテスト用
     // @Scheduled(fixedRate = 30000)
     @Scheduled(cron = "0 30 10 * * *", zone = "Asia/Tokyo")
     public void checkSale() {
         try {
             Document doc = Jsoup.connect(anaUrl).get();
 
-            // サイトの文字を取得する
-            String getText = doc.text();
+            // セール開催中のバナーがあるか確認する
+            Elements saleBanner = doc.select("a[href='/ja/jp/domestic/theme/timesale/sale/']");
 
-            // 現在の状況を判定する
-            boolean isSaleEnded = getText.contains("国内線航空券タイムセールは終了しました。");
-
-            // 「タイムセール」の文字列があるか判定する
-            if (isSaleEnded) {
-                log.info("タイムセール未開催");
-                slackNotificationService.send("ANAのタイムセールは終了しています。待ちましょう。\n" + anaUrl);
-            } else {
+            // 通知の内容を決定して送信
+            if (!saleBanner.isEmpty()) {
                 log.info("タイムセール開催中");
-                // Slackに通知する
                 slackNotificationService.send("ANAのタイムセールが開催しています!確認してください!!\n" + anaUrl);
+            } else {
+                log.info("タイムセール終了");
+                slackNotificationService.send("ANAのタイムセールは終了しています。待ちましょう。\n" + anaUrl);
             }
         } catch (IOException e) {
             log.error("接続に失敗しました：{}", e.getMessage());

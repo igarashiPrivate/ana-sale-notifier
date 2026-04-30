@@ -27,6 +27,23 @@ jobs:
       - name: Build
         run: ./gradlew build -x test --no-daemon
 
+      # ↓ 確認用（原因特定後に削除）
+      - name: Debug secrets check
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL_ID }}
+        run: |
+          if [ -z "$SLACK_BOT_TOKEN" ]; then
+            echo "SLACK_BOT_TOKEN is EMPTY or NOT SET"
+          else
+            echo "SLACK_BOT_TOKEN is SET (length: ${#SLACK_BOT_TOKEN})"
+          fi
+          if [ -z "$SLACK_CHANNEL_ID" ]; then
+            echo "SLACK_CHANNEL_ID is EMPTY or NOT SET"
+          else
+            echo "SLACK_CHANNEL_ID is SET"
+          fi
+
       - name: Run Application
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

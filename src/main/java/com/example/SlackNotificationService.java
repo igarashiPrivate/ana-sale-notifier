@@ -24,7 +24,7 @@ public class SlackNotificationService {
         String envToken = System.getenv("SLACK_BOT_TOKEN");
         String envChannel = System.getenv("SLACK_CHANNEL_ID");
         // 環境変数があれば使う。なければ.envから読み込む
-        if (envToken != null && envChannel != null) {
+        if (envToken != null && !envToken.isEmpty() && envChannel != null && !envChannel.isEmpty()) {
             this.botToken = envToken;
             this.channelId = envChannel;
         } else {

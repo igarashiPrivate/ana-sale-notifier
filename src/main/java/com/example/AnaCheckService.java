@@ -29,7 +29,7 @@ public class AnaCheckService {
             Document doc = Jsoup.connect(anaUrl).get();
 
             // セール開催中のバナーがあるか確認する
-            Elements saleBanner = doc.select("a[href='/ja/jp/domestic/theme/timesale/sale/']");
+            Elements saleBanner = doc.select("a[href='timesale']");
 
             // 通知の内容を決定して送信
             if (!saleBanner.isEmpty()) {
